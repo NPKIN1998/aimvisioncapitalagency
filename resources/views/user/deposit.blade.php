@@ -1,53 +1,83 @@
 <x-app-layout>
-    <div class="min-h-screen flex items-center justify-center bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
-        <div class="w-full max-w-md bg-white rounded-3xl shadow-xl p-6 sm:p-8">
+    <div x-data="{ submitting: false }" class="min-h-dvh flex flex-col items-center justify-center px-4 py-8 sm:px-6 lg:px-8 relative">
 
-            <!-- Title -->
-            <h2 class="text-2xl font-bold text-center text-gray-800 sm:text-3xl mb-6">
-                Deposit Funds
-            </h2>
+        {{-- Subtle graph background (theme‑aware, same as landing) --}}
+        <div class="absolute inset-0 opacity-[0.03] pointer-events-none" aria-hidden="true"
+             style="background-image: linear-gradient(var(--primary) 1px, transparent 1px), linear-gradient(90deg, var(--primary) 1px, transparent 1px); background-size: 40px 40px;">
+        </div>
 
-            <!-- Mpesa Image -->
-            <div class="flex justify-center mb-6">
-                <img src="{{ asset('mpesalogo.png') }}" alt="Deposit"
-                    class="w-48 h-32 object-contain rounded-lg sm:w-56 sm:h-36 shadow-sm" />
+        {{-- Card --}}
+        <div class="relative w-full max-w-md bg-card/90 backdrop-blur-xl border border-border/40 rounded-3xl shadow-2xl p-6 sm:p-8">
+
+            {{-- Diamond logo + title --}}
+            <div class="flex flex-col items-center mb-6">
+                <div class="w-14 h-14 sm:w-16 sm:h-16 bg-primary flex items-center justify-center shadow-xl mb-3"
+                     style="clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);">
+                    <i class="bi bi-cash-stack text-2xl sm:text-3xl text-white"></i>
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-bold text-foreground">Deposit Funds</h2>
+                <p class="text-sm text-muted-foreground mt-1">Add money via M‑Pesa</p>
             </div>
 
-            <!-- Deposit Form -->
-            <form class="space-y-5" method="POST" action="{{ route('deposit.store') }}">
+            {{-- M‑Pesa logo --}}
+            <div class="flex justify-center mb-6">
+                <img src="{{ asset('mpesalogo.png') }}" alt="M‑Pesa"
+                     class="w-44 h-28 sm:w-52 sm:h-32 object-contain rounded-xl bg-white/50 backdrop-blur-sm border border-border/30 p-2 shadow-sm" />
+            </div>
+
+            {{-- Form --}}
+            <form method="POST" action="{{ route('deposit.store') }}" class="space-y-5" @submit.prevent="submitting = true; $el.submit()">
                 @csrf
 
-                <!-- Mpesa Number Field -->
-                <div>
-                    <label for="phone" class="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">Mpesa
-                        Number</label>
-                    <input type="tel" name="phone" id="phone" x-model="phone"
-                        value="{{ Auth::user()->phone }}" placeholder="Enter Mpesa number"
-                        class="w-full px-4 py-2 sm:py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition duration-200" />
+                {{-- Phone number (floating label) --}}
+                <div class="relative">
+                    <input type="tel" name="phone" id="phone"
+                           value="{{ Auth::user()->phone }}" required
+                           placeholder=" "
+                           class="peer w-full pl-10 pt-5 pb-2 bg-input border border-border rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/30 outline-none transition text-foreground" />
+                    <i class="bi bi-phone absolute left-3 top-4 text-muted-foreground transition-colors peer-focus:text-primary" aria-hidden="true"></i>
+                    <label for="phone"
+                           class="absolute left-10 top-2 text-xs text-muted-foreground transition-all
+                                  peer-placeholder-shown:top-4 peer-placeholder-shown:text-sm
+                                  peer-focus:top-2 peer-focus:text-xs peer-focus:text-primary">
+                        M‑Pesa number
+                    </label>
                 </div>
 
-                <!-- Amount Field -->
-                <div>
-                    <label for="amount" class="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">Amount</label>
-                    <input type="number" name="amount" id="amount" x-model="amount" min="1"
-                        placeholder="Enter deposit amount"
-                        class="w-full px-4 py-2 sm:py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition duration-200" />
+                {{-- Amount (floating label) --}}
+                <div class="relative">
+                    <input type="number" name="amount" id="amount"
+                           min="1" required placeholder=" "
+                           class="peer w-full pl-10 pt-5 pb-2 bg-input border border-border rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/30 outline-none transition text-foreground" />
+                    <i class="bi bi-cash absolute left-3 top-4 text-muted-foreground transition-colors peer-focus:text-primary" aria-hidden="true"></i>
+                    <label for="amount"
+                           class="absolute left-10 top-2 text-xs text-muted-foreground transition-all
+                                  peer-placeholder-shown:top-4 peer-placeholder-shown:text-sm
+                                  peer-focus:top-2 peer-focus:text-xs peer-focus:text-primary">
+                        Amount
+                    </label>
                 </div>
 
-                <!-- Deposit Button -->
-                <div class="mt-6">
-                    <x-primary-button type="submit"
-                        class="w-full py-2 sm:py-3 rounded-lg justify-center font-semibold transition duration-200 transform hover:scale-105 shadow-md">
-                        Deposit Now
-                    </x-primary-button>
-                </div>
+                {{-- Submit button (primary with loading state) --}}
+                <x-primary-button type="submit" x-bind:disabled="submitting"
+                    class="w-full justify-center py-3 text-base mt-2 relative">
+                    <span x-show="!submitting">
+                        <i class="bi bi-send mr-2"></i> Deposit Now
+                    </span>
+                    <span x-show="submitting" class="flex items-center gap-2">
+                        <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                        </svg>
+                        Processing…
+                    </span>
+                </x-primary-button>
             </form>
 
-            <!-- Optional Info / Note -->
-            <p class="mt-6 text-center text-xs text-gray-500">
-                Ensure your Mpesa number is active and you have sufficient balance.
+            {{-- Footer note --}}
+            <p class="mt-5 text-center text-xs text-muted-foreground">
+                Ensure your M‑Pesa number is active and you have sufficient balance.
             </p>
-
         </div>
     </div>
 </x-app-layout>

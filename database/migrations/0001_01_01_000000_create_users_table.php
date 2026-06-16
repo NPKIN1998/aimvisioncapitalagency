@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('username')->unique();
             $table->string('phone')->unique();
             $table->string('email')->unique();
-            $table->enum('type', ['user', 'agent'])->default('user');
+            $table->enum('role', ['user', 'agent', 'admin'])->default('user');
             $table->enum('status', ['inactive', 'active'])->default('inactive');
             $table->decimal('balance', 10, 2)->default(0.00);
             $table->decimal('deposits', 10, 2)->default(0.00);

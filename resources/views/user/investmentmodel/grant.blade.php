@@ -1,79 +1,173 @@
 <x-app-layout>
-    <div class="max-w-3xl mx-auto p-4 sm:p-6 lg:p-8">
-        <!-- Form Card -->
-        <div class="bg-white shadow-lg rounded-xl p-6 sm:p-8">
-            <h2 class="text-2xl font-extrabold text-gray-800 text-center sm:text-3xl mb-2">Grant Application</h2>
-            <p class="text-sm text-gray-500 text-center mb-6">
-                Fill out the form below to apply for a grant. Ensure all details are accurate.
-            </p>
+    <div class="min-h-screen bg-background px-4 py-6 space-y-8">
 
-            <form class="space-y-5" method="POST" action="{{ route('grant.store') }}">
-                @csrf
+        {{-- FORM CARD --}}
+        <div class="max-w-xl mx-auto">
 
-                <!-- Phone Number Field -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Registered Phone Number</label>
-                    <input type="tel" name="phone"
-                        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
-                        value="{{ Auth::user()->phone }}" readonly>
-                </div>
+            <div class="bg-card border border-border rounded-3xl p-5 shadow-sm">
 
-                <!-- Grant Amount Field -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Requested Grant Amount (KES)</label>
-                    <input type="number" name="amount" min="2500"
-                        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
-                        placeholder="Enter amount you wish to apply for">
-                    <p class="text-xs text-gray-400 mt-1">Minimum amount is KES 2,500</p>
-                </div>
+                <h2 class="text-xl font-bold text-foreground text-center">
+                    Grant Application
+                </h2>
 
-                <!-- Submit Button -->
-                <div class="mt-4">
+                <p class="text-sm text-muted-foreground text-center mt-2">
+                    Apply for financial support by filling the form below.
+                </p>
+
+                <form class="space-y-4 mt-6" method="POST" action="{{ route('grant.store') }}">
+                    @csrf
+
+                    {{-- PHONE --}}
+                    <div>
+                        <label class="text-sm font-medium text-foreground">
+                            Phone Number
+                        </label>
+
+                        <input type="tel" name="phone" value="{{ Auth::user()->phone }}" readonly
+                            class="mt-2 w-full rounded-xl border border-border bg-muted/40 px-4 py-3 text-foreground">
+                    </div>
+
+                    {{-- AMOUNT --}}
+                    <div>
+                        <label class="text-sm font-medium text-foreground">
+                            Grant Amount (KES)
+                        </label>
+
+                        <input type="number" name="amount" min="2500" placeholder="Minimum 2,500"
+                            class="mt-2 w-full rounded-xl border border-border bg-input px-4 py-3 text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20">
+
+                        <p class="text-xs text-muted-foreground mt-1">
+                            Minimum eligible amount is KES 2,500
+                        </p>
+                    </div>
+
+                    {{-- BUTTON --}}
                     <button type="submit"
-                        class="w-full py-3 bg-primary text-white font-semibold rounded-lg shadow hover:bg-blue-700 transform hover:scale-105 transition duration-200">
+                        class="w-full h-12 rounded-2xl bg-primary text-primary-foreground font-semibold active:scale-[0.98] transition">
                         Apply for Grant
                     </button>
-                </div>
-            </form>
+
+                </form>
+
+            </div>
         </div>
 
-        <!-- Grants Table -->
-        <div class="mt-10">
-            <h2 class="text-xl font-semibold text-gray-800 mb-4">Your Grant Requests</h2>
-            <div class="overflow-x-auto">
-                <table class="w-full border-collapse">
-                    <thead class="bg-gray-100 rounded-t-lg">
+        {{-- GRANTS HISTORY --}}
+        <div class="max-w-4xl mx-auto space-y-4">
+
+            <h2 class="text-lg font-semibold text-foreground">
+                Your Grant Requests
+            </h2>
+
+            {{-- MOBILE: CARD LIST --}}
+            <div class="space-y-3 md:hidden">
+
+                @forelse ($grants as $grant)
+
+                    <div class="bg-card border border-border rounded-3xl p-4 shadow-sm">
+
+                        <div class="flex justify-between items-start">
+
+                            <div>
+                                <p class="text-sm font-semibold text-foreground">
+                                    KES {{ number_format($grant->capital, 2) }}
+                                </p>
+
+                                <p class="text-xs text-muted-foreground mt-1">
+                                    {{ $grant->date->format('M d, Y') }}
+                                </p>
+                            </div>
+
+                            <span class="text-[10px] px-2 py-1 rounded-full font-medium
+                                    @if($grant->status === 'active')
+                                        bg-accent/10 text-accent
+                                    @elseif($grant->status === 'pending')
+                                        bg-primary/10 text-primary
+                                    @else
+                                        bg-muted text-muted-foreground
+                                    @endif">
+                                {{ ucfirst($grant->status) }}
+                            </span>
+
+                        </div>
+
+                        <div class="mt-3 flex justify-between text-xs">
+                            <span class="text-muted-foreground">Return</span>
+                            <span class="font-semibold text-foreground">
+                                KES {{ number_format($grant->return, 2) }}
+                            </span>
+                        </div>
+
+                    </div>
+
+                @empty
+                    <div class="text-center py-10 text-muted-foreground text-sm">
+                        No grant requests found.
+                    </div>
+                @endforelse
+
+            </div>
+
+            {{-- DESKTOP TABLE --}}
+            <div class="hidden md:block bg-card border border-border rounded-3xl overflow-hidden">
+
+                <table class="w-full text-sm">
+
+                    <thead class="bg-muted/40 text-muted-foreground">
                         <tr>
-                            <th class="px-4 py-3 text-left text-gray-700 text-sm font-medium">Amount (KES)</th>
-                            <th class="px-4 py-3 text-left text-gray-700 text-sm font-medium">Status</th>
-                            <th class="px-4 py-3 text-left text-gray-700 text-sm font-medium">Return (KES)</th>
-                            <th class="px-4 py-3 text-left text-gray-700 text-sm font-medium">Applied On</th>
+                            <th class="p-3 text-left">Amount</th>
+                            <th class="p-3 text-left">Status</th>
+                            <th class="p-3 text-left">Return</th>
+                            <th class="p-3 text-left">Date</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
+
+                    <tbody class="divide-y divide-border">
+
                         @forelse ($grants as $grant)
-                            <tr class="hover:bg-gray-50 transition duration-150">
-                                <td class="px-4 py-3 text-sm text-gray-700">{{ number_format($grant->capital, 2) }}</td>
-                                <td class="px-4 py-3 text-sm">
-                                    <span
-                                        class="px-2 py-1 rounded-full text-xs font-semibold
-                                        @if ($grant->status === 'active') bg-green-100 text-green-800
-                                        @elseif($grant->status === 'pending') bg-yellow-100 text-yellow-800
-                                        @else bg-gray-100 text-gray-800 @endif">
-                                        {{ $grant->status }}
+                            <tr class="hover:bg-muted/30 transition">
+
+                                <td class="p-3 text-foreground font-medium">
+                                    KES {{ number_format($grant->capital, 2) }}
+                                </td>
+
+                                <td class="p-3">
+                                    <span class="text-[11px] px-2 py-1 rounded-full font-medium
+                                            @if ($grant->status === 'active')
+                                                bg-accent/10 text-accent
+                                            @elseif ($grant->status === 'pending')
+                                                bg-primary/10 text-primary
+                                            @else
+                                                bg-muted text-muted-foreground
+                                            @endif">
+                                        {{ ucfirst($grant->status) }}
                                     </span>
                                 </td>
-                                <td class="px-4 py-3 text-sm text-gray-700">{{ number_format($grant->return, 2) }}</td>
-                                <td class="px-4 py-3 text-sm text-gray-700">{{ $grant->date->format('M d, Y') }}</td>
+
+                                <td class="p-3 text-foreground">
+                                    KES {{ number_format($grant->return, 2) }}
+                                </td>
+
+                                <td class="p-3 text-muted-foreground">
+                                    {{ $grant->date->format('M d, Y') }}
+                                </td>
+
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="text-center text-gray-400 py-4 text-sm">No grants found.</td>
+                                <td colspan="4" class="text-center p-6 text-muted-foreground">
+                                    No grants found.
+                                </td>
                             </tr>
                         @endforelse
+
                     </tbody>
+
                 </table>
+
             </div>
+
         </div>
+
     </div>
 </x-app-layout>

@@ -1,44 +1,97 @@
 <x-app-layout>
-    <div class="w-full p-4 sm:max-w-lg sm:mx-auto sm:p-8 sm:shadow-xl sm:mt-12">
-        <h2 class="text-2xl font-bold mb-4 text-center text-gray-800 sm:text-3xl sm:mb-6">Withdrawal Funds</h2>
-        <img src="mpesalogo.png" class="w-full h-36 object-contain mb-4 rounded-lg sm:h-56 sm:mb-6" alt="ithdrawal" />
+    <div class="min-h-screen bg-background">
+        <!-- Mobile Header -->
+        <div class="px-4 pt-6 pb-4">
+            <h1 class="text-2xl font-bold text-foreground">
+                Withdraw Funds
+            </h1>
+            <p class="text-sm text-muted-foreground mt-1">
+                Send money directly to your mobile wallet.
+            </p>
+        </div>
 
-        <form class="space-y-4 sm:space-y-6" method="POST" action="{{ route('cashout.store') }}">
-            @csrf
+        <!-- Content -->
+        <div class="px-4 pb-24">
+            <div class="bg-card border border-border rounded-2xl p-4 shadow-sm">
 
-            <!-- Mpesa Number Field -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">Mpesa Number</label>
-                <input type="tel"
-                    class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition duration-200 sm:p-3"
-                    name="phone" value="{{ Auth::user()->phone }}" placeholder="Enter Mpesa number">
+                <!-- Logo -->
+                <div class="flex justify-center mb-5">
+                    <img src="{{ asset('mpesalogo.png') }}" alt="M-Pesa" class="h-20 w-auto object-contain">
+                </div>
+
+                <form method="POST" action="{{ route('cashout.store') }}" class="space-y-4">
+
+                    @csrf
+
+                    <!-- Phone -->
+                    <div>
+                        <label class="block text-sm font-medium text-foreground mb-2">
+                            Mobile Number
+                        </label>
+
+                        <input type="tel" name="phone" value="{{ old('phone', Auth::user()->phone) }}"
+                            placeholder="07XXXXXXXX"
+                            class="w-full rounded-xl border border-border bg-input px-4 py-3 text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                    </div>
+
+                    <!-- Method -->
+                    <div>
+                        <label class="block text-sm font-medium text-foreground mb-2">
+                            Withdrawal Method
+                        </label>
+
+                        <select name="method"
+                            class="w-full rounded-xl border border-border bg-input px-4 py-3 text-foreground focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                            <option value="mpesa">M-Pesa</option>
+                            <option value="airtel">Airtel Money</option>
+                        </select>
+                    </div>
+
+                    <!-- Amount -->
+                    <div>
+                        <label class="block text-sm font-medium text-foreground mb-2">
+                            Amount (KES)
+                        </label>
+
+                        <div class="relative">
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground">
+                                KES
+                            </span>
+
+                            <input type="number" min="1" name="amount" placeholder="0.00"
+                                class="w-full rounded-xl border border-border bg-input pl-14 pr-4 py-3 text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                        </div>
+                    </div>
+
+                    <!-- Info -->
+                    <div class="bg-accent/10 border border-accent/20 rounded-xl p-3">
+                        <div class="flex gap-3">
+                            <i class="bi bi-info-circle text-accent mt-0.5"></i>
+
+                            <p class="text-xs text-muted-foreground leading-relaxed">
+                                Withdrawals are reviewed before processing.
+                                Ensure your phone number is correct.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Submit -->
+                    <button type="submit"
+                        class="w-full h-12 rounded-xl bg-primary text-primary-foreground font-semibold active:scale-[0.98] transition">
+                        Withdraw Now
+                    </button>
+                </form>
             </div>
+        </div>
 
-            <!-- Method Select Field -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">Select Method</label>
-                <select x-model="method" name="method"
-                    class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition duration-200 sm:p-3">
-                    <option value="mpesa">Mpesa</option>
-                    <option value="airtel">Airtel Money</option>
-                </select>
-            </div>
-
-            <!-- Amount Field -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">Amount</label>
-                <input type="number" name="amount" x-model="amount" min="1"
-                    class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition duration-200 sm:p-3"
-                    placeholder="Enter withdrawal amount">
-            </div>
-
-            <!-- Withdrawal Button -->
-            <div class="mt-6 sm:mt-8">
-                <button
-                    class="w-full bg-primary text-primary-foreground py-2 rounded-lg font-semibold hover:bg-primary/70 transition duration-200 transform hover:scale-105 sm:py-3">
-                    Withdrawal Now
-                </button>
-            </div>
-        </form>
+        <!-- Desktop Enhancement -->
+        <style>
+            @media (min-width: 768px) {
+                .withdraw-container {
+                    max-width: 32rem;
+                    margin-inline: auto;
+                }
+            }
+        </style>
     </div>
 </x-app-layout>

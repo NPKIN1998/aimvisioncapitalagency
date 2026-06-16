@@ -3,14 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Transaction;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
-
-    public function index(): View
+    public function index(Request $request): View
     {
-        $transactions = Transaction::latest()->take(5)->get();
+        $transactions = Transaction::where('user_id', $request->user()->id)->latest()->take(5)->get();
 
         // dd($transactions->toArray());
 

@@ -1,19 +1,22 @@
 <x-app-layout>
-    <div class="container mx-auto px-4 pb-12 max-w-7xl">
-        <!-- Hero Section -->
-        <header class="mb-12 text-center">
-            <h1
-                class="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 bg-linear-to-r from-blue-600 to-purple-600 text-transparent bg-clip-text animate-gradient">
+    <div class="min-h-screen bg-background px-4 py-6">
+
+        {{-- HERO --}}
+        <header class="text-center mb-8">
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-foreground mb-3">
                 Find Your Dream Rental
             </h1>
-            <p class="text-gray-500 max-w-2xl mx-auto text-sm sm:text-base">
-                Explore our hand-picked collection of premium properties that match your lifestyle.
+
+            <p class="text-sm text-muted-foreground max-w-md mx-auto">
+                Explore premium properties tailored to your investment goals.
             </p>
         </header>
 
-        <!-- Property Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+        {{-- GRID (mobile-first: single column by default) --}}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+
             @foreach ($properties as $property)
+
                 @php
                     $imageMap = [
                         'Luxury Villa' => '/images/luxuryvilla.png',
@@ -25,63 +28,71 @@
                         'Lakefront House' => '/images/lakefronthouse.png',
                         'Suburban Home' => '/images/suburbanhome.png',
                     ];
+
                     $image = $imageMap[$property->name] ?? '/images/default.png';
-                    $formattedCapital = number_format($property->capital, 2);
                 @endphp
 
+                {{-- CARD --}}
                 <article
-                    class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition duration-300 flex flex-col border border-gray-200 hover:border-blue-400">
+                    class="bg-card border border-border rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition">
 
-                    <!-- Property Image -->
-                    <div class="relative w-full overflow-hidden">
-                        <div class="aspect-w-4 aspect-h-3 sm:aspect-w-16 sm:aspect-h-9 lg:aspect-w-3 lg:aspect-h-2">
-                            <img src="{{ $image }}" alt="{{ $property['name'] }}"
-                                class="object-cover w-full h-48 transition-transform duration-500 group-hover:scale-105"
-                                loading="lazy">
-                        </div>
+                    {{-- IMAGE --}}
+                    <div class="relative">
+
+                        <img src="{{ $image }}" alt="{{ $property->name }}" class="w-full h-44 sm:h-52 object-cover">
+
+                        {{-- PRICE BADGE --}}
                         <div
-                            class="absolute top-3 left-3 bg-blue-600 text-white text-xs sm:text-sm font-semibold px-2 py-1 rounded-md shadow-md">
-                            KES {{ number_format($property['capital'], 2) }}
+                            class="absolute top-3 left-3 bg-primary/90 text-primary-foreground text-xs font-semibold px-3 py-1 rounded-xl shadow-sm">
+                            KES {{ number_format($property->capital, 2) }}
                         </div>
+
                     </div>
 
-                    <!-- Property Details -->
-                    <div class="p-5 flex-1 flex flex-col">
-                        <h2 class="text-lg sm:text-xl font-semibold text-gray-800 mb-2 line-clamp-1">
-                            {{ $property['name'] }}
+                    {{-- CONTENT --}}
+                    <div class="p-4 flex flex-col gap-3">
+
+                        <h2 class="text-base font-semibold text-foreground line-clamp-1">
+                            {{ $property->name }}
                         </h2>
 
-                        <div class="flex flex-wrap gap-2 mb-4 text-xs sm:text-sm">
-                            <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded-full">
-                                🏠 Daily Rent: KES {{ number_format($property['daily_rent'], 2) }}
+                        {{-- INFO CHIPS (mobile-first scroll wrap) --}}
+                        <div class="flex flex-wrap gap-2 text-xs">
+
+                            <span class="px-2 py-1 rounded-full bg-muted text-muted-foreground">
+                                🏠 {{ number_format($property->daily_rent, 2) }} / day
                             </span>
-                            <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded-full">
-                                📅 Days: {{ $property['days'] }}
+
+                            <span class="px-2 py-1 rounded-full bg-muted text-muted-foreground">
+                                📅 {{ $property->days }} days
                             </span>
-                            <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded-full">
-                                💰 Total Rent: KES {{ number_format($property['total_rent'], 2) }}
+
+                            <span class="px-2 py-1 rounded-full bg-muted text-muted-foreground">
+                                💰 {{ number_format($property->total_rent, 2) }}
                             </span>
-                            <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded-full">
-                                🎁 Upline Bonus: KES {{ number_format($property['upline_bonus'], 2) }}
+
+                            <span class="px-2 py-1 rounded-full bg-accent/10 text-accent">
+                                🎁 {{ number_format($property->upline_bonus, 2) }}
                             </span>
+
                         </div>
 
-                        <!-- Action Button (stick to bottom) -->
-                        <form method="POST" action="{{ route('release.store') }}" class="mt-auto">
+                        {{-- ACTION --}}
+                        <form method="POST" action="{{ route('release.store') }}" class="mt-2">
                             @csrf
-                            <input type="hidden" name="property_id" value="{{ $property['id'] }}">
+                            <input type="hidden" name="property_id" value="{{ $property->id }}">
+
                             <button type="submit"
-                                class="w-full bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-2.5 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all duration-300">
-                                <span>Select</span>
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                </svg>
+                                class="w-full h-11 rounded-2xl bg-primary text-primary-foreground font-semibold active:scale-[0.98] transition">
+                                Select Property
                             </button>
                         </form>
+
                     </div>
                 </article>
+
             @endforeach
+
         </div>
     </div>
 </x-app-layout>

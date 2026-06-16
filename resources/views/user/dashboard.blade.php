@@ -1,287 +1,187 @@
 <x-app-layout>
-    <div class="container mx-auto px-4 py-6 bg-gray-50">
+    <div class="w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10 space-y-8 sm:space-y-10">
 
-        <!-- Professional Balance Card -->
-        <div x-data="{
-            showBalance: false,
-            isLoading: false,
-            toggleBalance() {
-                this.isLoading = true;
-                setTimeout(() => {
-                    this.showBalance = !this.showBalance;
-                    this.isLoading = false;
-                }, 300);
-            }
-        }"
-            class="relative w-full mx-auto bg-linear-to-r from-indigo-600 to-purple-600 text-white rounded-3xl shadow-2xl overflow-hidden p-6 sm:p-8 md:p-10 flex flex-col items-center">
+        {{-- ===== BALANCE CARD ===== --}}
+        <div x-data="{ showBalance: false, isLoading: false, toggleBalance() { this.isLoading = true; setTimeout(() => { this.showBalance = !this.showBalance; this.isLoading = false }, 300) } }"
+            class="relative overflow-hidden bg-linear-to-br from-primary via-primary to-primary/90 rounded-2xl shadow-2xl">
 
-            <!-- Animated Gradient Overlay -->
-            <div
-                class="absolute inset-0 bg-linear-to-br from-indigo-500 via-purple-500 to-pink-500 opacity-20 animate-gradient-slow pointer-events-none rounded-3xl">
+            {{-- Professional grid overlay (theme‑aware) --}}
+            <div class="absolute inset-0 opacity-[0.07] pointer-events-none"
+                style="background-image: linear-gradient(var(--primary-foreground) 1px, transparent 1px), linear-gradient(90deg, var(--primary-foreground) 1px, transparent 1px); background-size: 40px 40px;">
             </div>
 
-            <!-- Background Circles -->
-            <div class="absolute inset-0 opacity-10 pointer-events-none" aria-hidden="true">
-                <div
-                    class="absolute top-0 right-0 w-24 h-24 md:w-32 md:h-32 bg-white/20 rounded-full -translate-y-12 translate-x-12 md:-translate-y-16 md:translate-x-16 animate-float-slow">
-                </div>
-                <div
-                    class="absolute bottom-0 left-0 w-16 h-16 md:w-24 md:h-24 bg-white/20 rounded-full translate-y-8 -translate-x-8 md:translate-y-12 md:-translate-x-12 animate-float-slow">
-                </div>
-            </div>
+            {{-- Subtle vignette for depth --}}
+            <div class="absolute inset-0 bg-linear-to-t from-black/20 to-transparent pointer-events-none"></div>
 
-            <!-- Header -->
-            <div class="flex items-center justify-between w-full mb-4 relative z-10">
-                <h2 class="text-xs md:text-sm font-semibold uppercase tracking-wider text-white/80">
-                    Available Balance
-                </h2>
-                <button @click="toggleBalance()" :disabled="isLoading"
-                    :aria-label="showBalance ? 'Hide balance' : 'Show balance'" :aria-pressed="showBalance"
-                    class="p-2 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/30 focus:outline-none focus:ring-2 focus:ring-white/50 transition transform hover:scale-105">
-                    <template x-if="isLoading">
-                        <i class="bi bi-arrow-repeat animate-spin text-lg md:text-xl text-white"></i>
-                    </template>
-                    <template x-if="!isLoading">
-                        <i :class="showBalance ? 'bi-eye-slash' : 'bi-eye'"
-                            class="text-lg md:text-xl transition-colors"></i>
-                    </template>
-                </button>
-            </div>
-
-            <!-- Balance Display -->
-            <div
-                class="text-3xl md:text-4xl font-bold mb-5 md:mb-6 min-h-[2.5rem] md:min-h-[3rem] flex items-center relative z-10">
-                <!-- Visible Balance -->
-                <template x-if="showBalance">
-                    <div class="flex items-baseline fade-in transition-opacity duration-500">
-                        <span class="sr-only">Your balance is</span>
-                        <x-currency-display :amount="Auth::user()->balance" />
+            <div class="relative p-6 sm:p-8 lg:p-10">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+                    {{-- Left: label + balance --}}
+                    <div class="flex-1">
+                        <p
+                            class="text-xs sm:text-sm font-semibold uppercase tracking-[0.3em] text-primary-foreground/50 mb-2">
+                            Available Balance
+                        </p>
+                        <div class="min-h-16 sm:min-h-20 flex items-center">
+                            <template x-if="showBalance">
+                                <div class="fade-in">
+                                    <span class="sr-only">Your balance is</span>
+                                    <x-currency-display :amount="Auth::user()->balance"
+                                        class="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tighter text-white" />
+                                </div>
+                            </template>
+                            <template x-if="!showBalance">
+                                <div class="flex gap-2 fade-in" aria-hidden="true">
+                                    <span class="w-10 h-6 sm:w-12 sm:h-7 bg-white/20 rounded-lg animate-pulse"></span>
+                                    <span class="w-16 h-6 sm:w-20 sm:h-7 bg-white/20 rounded-lg animate-pulse"></span>
+                                    <span class="w-20 h-6 sm:w-24 sm:h-7 bg-white/20 rounded-lg animate-pulse"></span>
+                                </div>
+                            </template>
+                        </div>
                     </div>
-                </template>
 
-                <!-- Hidden Balance Skeleton -->
-                <template x-if="!showBalance">
-                    <div class="flex space-x-2 fade-in transition-opacity duration-500" aria-hidden="true">
-                        <span class="w-10 h-6 md:w-12 md:h-8 bg-white/30 rounded-lg animate-pulse"></span>
-                        <span class="w-14 h-6 md:w-16 md:h-8 bg-white/30 rounded-lg animate-pulse"></span>
-                        <span class="w-16 h-6 md:w-20 md:h-8 bg-white/30 rounded-lg animate-pulse"></span>
-                    </div>
-                </template>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="mt-6 flex flex-col sm:flex-row gap-4 w-full">
-                <a href="{{ route('deposit') }}"
-                    class="flex-1 bg-white text-indigo-600 font-semibold py-3 rounded-xl text-center shadow-md hover:shadow-xl transition-all hover:-translate-y-1 hover:scale-105">
-                    Deposit
-                </a>
-                <a href="{{ route('cashout') }}"
-                    class="flex-1 bg-white text-purple-600 font-semibold py-3 rounded-xl text-center shadow-md hover:shadow-xl transition-all hover:-translate-y-1 hover:scale-105">
-                    Withdraw
-                </a>
+                    {{-- Right: toggle button (glass style) --}}
+                    <button @click="toggleBalance()" :disabled="isLoading"
+                        :aria-label="showBalance ? 'Hide balance' : 'Show balance'"
+                        class="shrink-0 group relative size-12 sm:size-14 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-md flex items-center justify-center transition-all duration-200 hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
+                        <template x-if="isLoading">
+                            <i class="bi bi-arrow-repeat animate-spin text-xl sm:text-2xl text-white"></i>
+                        </template>
+                        <template x-if="!isLoading">
+                            <i :class="showBalance ? 'bi-eye-slash' : 'bi-eye'"
+                                class="text-xl sm:text-2xl text-white transition-transform group-hover:scale-110"></i>
+                        </template>
+                    </button>
+                </div>
             </div>
         </div>
 
-        <!-- Tailwind Animations -->
-        <style>
-            /* Fade-in animation */
-            .fade-in {
-                opacity: 0;
-                animation: fadeIn 0.5s forwards;
-            }
-
-            @keyframes fadeIn {
-                to {
-                    opacity: 1;
-                }
-            }
-
-            /* Floating circles */
-            @keyframes float {
-
-                0%,
-                100% {
-                    transform: translateY(0)
-                }
-
-                50% {
-                    transform: translateY(-10px)
-                }
-            }
-
-            .animate-float-slow {
-                animation: float 6s ease-in-out infinite;
-            }
-
-            /* Gradient overlay animation */
-            @keyframes gradient {
-                0% {
-                    background-position: 0% 50%
-                }
-
-                50% {
-                    background-position: 100% 50%
-                }
-
-                100% {
-                    background-position: 0% 50%
-                }
-            }
-
-            .animate-gradient-slow {
-                background-size: 400% 400%;
-                animation: gradient 15s ease infinite;
-            }
-        </style>
-
-
-
-
-
-        <!-- Action Buttons Section -->
-        <div class="mt-8 grid grid-cols-3 md:grid-cols-6 gap-5">
+        {{-- QUICK ACTIONS (themed, distinct per item) --}}
+        <div class="grid grid-cols-3 lg:grid-cols-6 gap-4">
             @php
                 $actions = [
-                    [
-                        'route' => 'plan',
-                        'label' => 'Plan',
-                        'icon' => 'bi-card-list',
-                        'bg' => 'bg-orange-200 hover:bg-orange-300',
-                        'text' => 'text-orange-700',
-                    ],
-                    [
-                        'route' => 'grant',
-                        'label' => 'Grant',
-                        'icon' => 'bi-gift',
-                        'bg' => 'bg-red-200 hover:bg-red-300',
-                        'text' => 'text-red-700',
-                    ],
-                    [
-                        'route' => 'cashout',
-                        'label' => 'Withdraw',
-                        'icon' => 'bi-cash-stack',
-                        'bg' => 'bg-yellow-200 hover:bg-yellow-300',
-                        'text' => 'text-yellow-700',
-                    ],
-                    [
-                        'route' => 'deposit',
-                        'label' => 'Deposit',
-                        'icon' => 'bi-wallet2',
-                        'bg' => 'bg-sky-200 hover:bg-sky-300',
-                        'text' => 'text-sky-700',
-                    ],
-                    [
-                        'route' => 'release',
-                        'label' => 'Rental',
-                        'icon' => 'bi-building',
-                        'bg' => 'bg-purple-200 hover:bg-purple-300',
-                        'text' => 'text-purple-700',
-                    ],
-                    [
-                        'route' => 'task',
-                        'label' => 'Task',
-                        'icon' => 'bi-list-task',
-                        'bg' => 'bg-green-200 hover:bg-green-300',
-                        'text' => 'text-green-700',
-                    ],
+                    ['route' => 'plan', 'label' => 'Plans', 'icon' => 'bi-graph-up', 'color' => 'primary'],
+                    ['route' => 'grant', 'label' => 'Grants', 'icon' => 'bi-award', 'color' => 'accent'],
+                    ['route' => 'cashout', 'label' => 'Withdraw', 'icon' => 'bi-cash-stack', 'color' => 'secondary'],
+                    ['route' => 'deposit', 'label' => 'Deposit', 'icon' => 'bi-wallet2', 'color' => 'primary'],
+                    ['route' => 'release', 'label' => 'Property', 'icon' => 'bi-building', 'color' => 'chart-3'],
+                    ['route' => 'task', 'label' => 'Tasks', 'icon' => 'bi-list-check', 'color' => 'secondary'],
+                ];
+
+                $colorMap = [
+                    'primary' => 'text-primary border-primary/30 hover:border-primary',
+                    'accent' => 'text-accent border-accent/30 hover:border-accent',
+                    'secondary' => 'text-secondary-foreground border-secondary/30 hover:border-secondary',
+                    'chart-3' => 'text-chart-3 border-chart-3/30 hover:border-chart-3',
                 ];
             @endphp
 
             @foreach ($actions as $action)
+                @php
+                    $colorClasses = $colorMap[$action['color']];
+                @endphp
                 <a href="{{ route($action['route']) }}"
-                    class="{{ $action['bg'] }} rounded-2xl p-4 flex flex-col items-center justify-center shadow-md hover:shadow-xl transition-transform transform hover:scale-105">
-                    <div class="h-12 w-12 rounded-full bg-white flex items-center justify-center shadow-inner">
-                        <i class="bi {{ $action['icon'] }} text-2xl {{ $action['text'] }}"></i>
+                    class="flex flex-col items-center justify-center p-4 sm:p-5 bg-card border border-border/30 rounded-2xl shadow-sm hover:shadow-md transition-all active:scale-[0.98] group {{ $colorClasses }}">
+                    <div
+                        class="size-12 sm:size-14 rounded-xl bg-white/70 dark:bg-white/10 backdrop-blur-md shadow-inner flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
+                        <i class="bi {{ $action['icon'] }} text-2xl sm:text-3xl {{ $colorClasses }}"></i>
                     </div>
-                    <p class="mt-2 text-sm font-semibold text-gray-900 text-center">
-                        {{ $action['label'] }}
-                    </p>
+                    <span class="text-xs sm:text-sm font-medium text-foreground text-center">{{ $action['label'] }}</span>
                 </a>
             @endforeach
         </div>
-
-
-        <!-- Recent Transactions Section -->
-        <div class="mt-10 bg-white shadow-md rounded-3xl p-6">
-            <div class="flex justify-between items-center mb-6">
-                <p class="text-xl font-bold text-gray-900">Recent Transactions</p>
-                <a href="{{ route('transactions') }}"
-                    class="text-indigo-500 font-medium text-sm hover:text-indigo-600 transition duration-300">
-                    View All
-                </a>
-            </div>
-
-            @if ($transactions->isEmpty())
-                <div class="flex flex-col items-center justify-center py-10 text-gray-400">
-                    <i class="bi bi-exclamation-circle text-4xl mb-4"></i>
-                    <p class="text-sm">No transactions yet.</p>
+        {{-- STATISTICS (now using currency component for monetary values) --}}
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            @php
+                $stats = [
+                    ['label' => 'Active Plans', 'value' => Auth::user()->plans()->where('status', 'active')->count(), 'icon' => 'bi-briefcase', 'color' => 'bg-primary/10 text-primary'],
+                    ['label' => 'Total Deposits', 'value' => Auth::user()->transactions()->where('type', 'deposit')->sum('amount'), 'icon' => 'bi-wallet2', 'color' => 'bg-accent/10 text-accent', 'is_currency' => true],
+                    ['label' => 'Referral Bonus', 'value' => Auth::user()->transactions()->where('type', 'referral_bonus')->sum('amount'), 'icon' => 'bi-people', 'color' => 'bg-chart-3/10 text-chart-3', 'is_currency' => true],
+                ];
+            @endphp
+            @foreach ($stats as $stat)
+                <div class="bg-card border border-border/30 rounded-2xl p-5 sm:p-6 flex items-center gap-4 shadow-sm">
+                    <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl {{ $stat['color'] }} flex items-center justify-center">
+                        <i class="bi {{ $stat['icon'] }} text-xl sm:text-2xl"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-sm text-muted-foreground font-medium">{{ $stat['label'] }}</p>
+                        @if ($stat['is_currency'] ?? false)
+                            <x-currency-display :amount="$stat['value']"
+                                class="text-lg sm:text-xl font-bold text-foreground truncate" />
+                        @else
+                            <p class="text-lg sm:text-xl font-bold text-foreground truncate">{{ $stat['value'] }}</p>
+                        @endif
+                    </div>
                 </div>
-            @else
-                <div class="flex flex-col divide-y divide-gray-200">
-                    @foreach ($transactions as $transaction)
-                        @php
-                            $typeValue =
-                                $transaction->type instanceof \App\Enums\TransactionType
-                                    ? $transaction->type->value
-                                    : $transaction->type;
+            @endforeach
+        </div>
 
-                            $typeClasses = [
-                                'deposit' => ['bg-green-100', 'text-green-600', 'Deposit'],
-                                'withdrawal' => ['bg-blue-100', 'text-blue-600', 'Withdrawal'],
-                                'investment' => ['bg-purple-100', 'text-purple-600', 'Job Payment'],
-                                'referral_bonus' => ['bg-indigo-100', 'text-indigo-600', 'Referral Bonus'],
-                                'wealth_fund' => ['bg-amber-100', 'text-amber-600', 'Wealth Fund'],
-                                'task_reward' => ['bg-amber-100', 'text-amber-600', 'Task Reward'],
-                            ];
+        @foreach ($transactions as $transaction)
+            @php
+                $typeValue = $transaction->type instanceof \App\Enums\TransactionType ? $transaction->type->value : $transaction->type;
+                $typeMeta = [
+                    'deposit' => ['icon' => 'bi-wallet2', 'color' => 'bg-accent/10 text-accent'],
+                    'withdrawal' => ['icon' => 'bi-cash-stack', 'color' => 'bg-primary/10 text-primary'],
+                    'investment' => ['icon' => 'bi-graph-up', 'color' => 'bg-secondary/20 text-secondary-foreground'],
+                    'referral_bonus' => ['icon' => 'bi-gift', 'color' => 'bg-chart-3/10 text-chart-3'],
+                    'wealth_fund' => ['icon' => 'bi-bank', 'color' => 'bg-accent/10 text-accent'],
+                    'task_reward' => ['icon' => 'bi-list-check', 'color' => 'bg-secondary/20 text-secondary-foreground'],
+                ][$typeValue] ?? ['icon' => 'bi-arrow-left-right', 'color' => 'bg-muted text-muted-foreground'];
+                $status = $transaction->status ?? 'pending';
+                $statusColor = [
+                    'completed' => 'bg-accent/20 text-accent',
+                    'approved' => 'bg-accent/20 text-accent',
+                    'pending' => 'bg-chart-3/20 text-chart-3',
+                    'failed' => 'bg-destructive/20 text-destructive',
+                    'active' => 'bg-primary/20 text-primary',
+                ][$status] ?? 'bg-muted/20 text-muted-foreground';
+                $amountSign = in_array($typeValue, ['withdrawal', 'investment']) ? '-' : '+';
+            @endphp
 
-                            $statusConfig = [
-                                'completed' => ['bg-green-400', 'text-green-600'],
-                                'approved' => ['bg-green-400', 'text-green-600'],
-                                'healthy' => ['bg-green-400', 'text-green-600'],
-                                'pending' => ['bg-yellow-400', 'text-yellow-600'],
-                                'failed' => ['bg-red-400', 'text-red-600'],
-                                'active' => ['bg-blue-400', 'text-blue-600'],
-                            ];
-
-                            $typeConfig = $typeClasses[$typeValue] ?? $typeClasses['deposit'];
-                            $status = $transaction->status ?? 'pending';
-                            $statusConfig = $statusConfig[$status] ?? $statusConfig['pending'];
-
-                            $currencySymbol = is_array($currency) ? $currency['symbol'] : $currency->symbol;
-                            $currencyRate = is_array($currency) ? $currency['rate'] : $currency->rate;
-
-                            $amountSign = in_array($typeValue, ['withdrawal', 'investment']) ? '-' : '+';
-                        @endphp
-
-                        <div class="flex items-center py-3">
-                            <div class="relative shrink-0 mr-4">
-                                <div
-                                    class="w-10 h-10 rounded-full {{ $typeConfig[0] }} flex items-center justify-center">
-                                    <span class="text-xs font-bold {{ $typeConfig[1] }}">
-                                        {{ substr($typeConfig[2], 0, 1) }}
-                                    </span>
-                                </div>
-                                <div
-                                    class="absolute -bottom-1 -right-1 w-3 h-3 rounded-full border border-gray-100 {{ $statusConfig[0] }}">
-                                </div>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <p class="text-sm font-medium text-gray-800">{{ $typeConfig[2] }}</p>
-                                <p class="text-xs text-gray-500">
-                                    {{ $amountSign }} {{ $currencySymbol }}
-                                    {{ number_format($transaction->amount * $currencyRate, 2) }}
-                                    • {{ \Carbon\Carbon::parse($transaction->created_at)->diffForHumans() }}
-                                </p>
-                            </div>
-                            <span class="text-xs font-semibold {{ $statusConfig[1] }}">
+            <div
+                class="bg-card border border-border/20 rounded-2xl p-4 sm:p-5 flex flex-row items-center justify-between gap-3 shadow-sm hover:shadow-md transition-shadow">
+                {{-- Left: icon + description – allowed to shrink --}}
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 rounded-full {{ $typeMeta['color'] }} flex items-center justify-center shrink-0">
+                        <i class="bi {{ $typeMeta['icon'] }} text-sm"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <p class="text-sm font-semibold text-foreground capitalize truncate">
+                                {{ str_replace('_', ' ', $typeValue) }}
+                            </p>
+                            <span class="text-xs px-2 py-0.5 rounded-full font-medium {{ $statusColor }} shrink-0">
                                 {{ ucfirst($status) }}
                             </span>
                         </div>
-                    @endforeach
+                        <p class="text-xs text-muted-foreground mt-0.5 truncate">
+                            {{ $transaction->created_at->diffForHumans() }}
+                        </p>
+                    </div>
                 </div>
-            @endif
-        </div>
 
-
+                {{-- Right: amount – always on the right, never wraps --}}
+                <div class="flex items-center gap-1 shrink-0">
+                    <span class="text-base sm:text-lg font-bold {{ $amountSign === '+' ? 'text-accent' : 'text-primary' }}">
+                        {{ $amountSign }}
+                    </span>
+                    <x-currency-display :amount="$transaction->amount"
+                        class="text-base sm:text-lg font-bold {{ $amountSign === '+' ? 'text-accent' : 'text-primary' }}" />
+                </div>
+            </div>
+        @endforeach
     </div>
+
+    <style>
+        .fade-in {
+            opacity: 0;
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
 </x-app-layout>

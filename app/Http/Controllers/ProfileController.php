@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ProfileUpdateRequest;
 use App\Models\User;
-use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Redirect;
-use App\Http\Requests\ProfileUpdateRequest;
+use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
@@ -18,10 +18,10 @@ class ProfileController extends Controller
 
         // Get downlines count and active downlines count in a single query
         $downlineStats = User::where('upline', $username)
-            ->selectRaw('
+            ->selectRaw("
                 COUNT(*) as total_downlines,
-                COALESCE(SUM(CASE WHEN status = "active" THEN 1 ELSE 0 END), 0) as active_downlines
-            ')
+                COALESCE(SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END), 0) as active_downlines
+            ")
             ->first();
 
         // // Correct dd() usage

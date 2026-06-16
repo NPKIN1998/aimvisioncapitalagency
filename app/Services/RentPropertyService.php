@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Log;
 
 class RentPropertyService
 {
-    public function  __construct(private ShortCodeService $shortcodeService) {}
+    public function __construct(private ShortCodeService $shortcodeService) {}
 
     public function purchaseRental(User $user, int $propertyId): void
     {
@@ -25,7 +25,7 @@ class RentPropertyService
 
         // Validate purchase conditions
         if ($user->balance < $property->capital) {
-            Log::info("User Balance Check", [
+            Log::info('User Balance Check', [
                 'user_balance' => $user->balance,
                 'property_capital' => $property->capital,
             ]);
@@ -39,6 +39,8 @@ class RentPropertyService
         }
 
         DB::beginTransaction();
+
+        dd('hey');
         try {
             // Safely update balance with fresh check
             $updated = DB::table('users')
@@ -46,14 +48,14 @@ class RentPropertyService
                 ->where('balance', '>=', $property->capital)
                 ->update([
                     'balance' => DB::raw("balance - {$property->capital}"),
-                    'updated_at' => now()
+                    'updated_at' => now(),
                 ]);
 
             if ($updated !== 1) {
-                Log::warning("User Balance Update Failed", [
+                Log::warning('User Balance Update Failed', [
                     'user_id' => $user->id,
                     'property_capital' => $property->capital,
-                    'updated_rows' => $updated
+                    'updated_rows' => $updated,
                 ]);
                 throw new ConcurrentModificationException('Balance update failed. Please try again.');
             }
@@ -70,14 +72,14 @@ class RentPropertyService
                 'next_payment' => now()->addHours(24),
                 'capital' => $property->capital,
                 'end_date' => now()->addDays(30),
-                'status' => 'active'
+                'status' => 'active',
             ]);
 
             // Generate a unique shortcode for the transaction
             $shortcode = $this->shortcodeService->generateShortcode(TransactionType::RENTAL_PURCHASE);
 
             // Create a transaction record
-            $tra =  Transaction::create([
+            $tra = Transaction::create([
                 'shortcode' => $shortcode,
                 'type' => TransactionType::RENTAL_PURCHASE->value,
                 'amount' => $property->capital,
@@ -94,7 +96,7 @@ class RentPropertyService
             Log::error("Rental purchase failed for user {$user->id}", [
                 'error' => $e->getMessage(),
                 'property' => $propertyId,
-                'balance_attempt' => $property->capital
+                'balance_attempt' => $property->capital,
             ]);
             throw new TransactionFailedException('Failed to complete rental purchase. Please try again.');
         }

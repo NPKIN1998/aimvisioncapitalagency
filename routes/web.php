@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\CashoutController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepositController;
@@ -15,7 +16,6 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
-
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->middleware('verified')->name('dashboard');
@@ -38,6 +38,10 @@ Route::middleware('auth')->group(function () {
     Route::post('release', [RentController::class, 'store'])->name('release.store');
     Route::get('task', [TaskController::class, 'index'])->name('task');
     Route::post('dailyTask', [TaskController::class, 'dailyTask'])->name('dailyTask');
+
+    Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/', [AdminDashboardController::class, 'index'])->name('index');
+    });
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';

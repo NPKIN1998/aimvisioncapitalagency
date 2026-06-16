@@ -24,7 +24,6 @@ class InvestmentService
     public function createInvestment(User $user, int $planId): void
     {
 
-
         $plan = Package::findOrFail($planId);
         $capital = $plan->initial_capital;
 
@@ -66,7 +65,7 @@ class InvestmentService
                 'type' => TransactionType::INVESTMENT->value,
                 'amount' => $capital,
                 'user_id' => $user->id,
-                'status' => 'pending',
+                'status' => 'active',
             ]);
 
             // Log investment creation
